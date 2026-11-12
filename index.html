@@ -1,0 +1,444 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>鑗惟伊金銀街</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&family=Cormorant+Garamond:wght@600&display=swap">
+<style>
+/* Layout concept: a framed night-street scene that scrolls sideways.
+   Silver stalls first, a gold price board in the middle, gold stalls last.
+   Tap a stall and the little shopper walks over, then a product sheet rises from the bottom. */
+:root{
+  --night:#0f1328; --night-2:#1b2142; --ground:#232846; --ground-line:#3b4370;
+  --ink:#eef1f8; --ink-dim:#a8b1ce; --edge:#ffffff24;
+  --silver:#dfe6f2; --gold:#efc05a; --gold-deep:#a9741f; --lantern:#c8452f; --jade:#2f8f7f;
+  --panel:#161b36; --sheet:#1a2040;
+  --display:"Noto Serif TC","Songti TC","PMingLiU","Noto Serif CJK TC",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",system-ui,sans-serif;
+  --latin:"Cormorant Garamond","Times New Roman",serif;
+  color-scheme:dark;
+}
+.silver{--awn-a:#e1e7f3;--awn-b:#5a6a90;--trim:#98a5c4;--glow:#b9d0ff;--metal:#e5ebf6;--gem:#8ec5ff;--counter:#2b3254;--velvet:#3d4d7d;--accent:#cdd8ee;--accent-ink:#141a33;--plate-a:#eef2f9;--plate-b:#a9b5ce}
+.gold{--awn-a:#c8452f;--awn-b:#f1c766;--trim:#b0801f;--glow:#ffd27a;--metal:#f2c25b;--gem:#e5604a;--counter:#3a2330;--velvet:#7d1f2b;--accent:#efc05a;--accent-ink:#3d130e;--plate-a:#f6d98e;--plate-b:#c9942f}
+
+*{box-sizing:border-box}
+body{
+  background:var(--night);color:var(--ink);font-family:var(--body);line-height:1.6;font-size:15px;
+  padding-block:14px 28px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.page{max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:14px}
+button{font:inherit;color:inherit}
+
+/* header */
+.brand{display:flex;justify-content:space-between;align-items:flex-end;gap:10px 16px;flex-wrap:wrap}
+.shop{margin:0;font-family:var(--display);font-weight:800;font-size:32px;line-height:1.1;letter-spacing:.06em}
+.latin{margin:2px 0 0;font-family:var(--latin);font-weight:600;font-size:15px;letter-spacing:.34em;color:var(--silver)}
+.kinds{margin:0;font-size:13px;letter-spacing:.18em;color:var(--ink-dim);border:1px solid var(--edge);border-radius:999px;padding:4px 14px}
+
+/* boss says */
+.boss{display:flex;gap:10px;align-items:center;background:#c8452f2e;border:1px dashed #e08a78aa;border-radius:12px;padding:8px 12px}
+.boss b{flex:none;font-size:12px;font-weight:700;background:var(--lantern);color:#fff;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.boss p{margin:0;min-width:0;font-size:14px}
+
+/* jump chips */
+.jump{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--night-2);border:1px solid var(--edge);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.chip:active{transform:scale(.97)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* scene */
+.scene{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--edge);background:var(--night-2)}
+.moon{position:absolute;z-index:4;top:14px;right:16px;width:26px;height:26px;border-radius:50%;background:#f3eed9;box-shadow:0 0 26px #f3eed959;pointer-events:none}
+.street{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.street::-webkit-scrollbar{display:none}
+.track{
+  position:relative;display:flex;align-items:flex-end;gap:14px;width:max-content;min-height:318px;padding:36px 30px 36px;
+  background-image:
+    radial-gradient(circle at 12% 20%,#ffffffaa 0 1px,transparent 1.6px),
+    radial-gradient(circle at 63% 38%,#ffffff88 0 1px,transparent 1.6px),
+    radial-gradient(circle at 85% 12%,#ffffffcc 0 1.2px,transparent 1.9px),
+    linear-gradient(#0f1328,#1d2445 78%);
+  background-size:210px 150px,170px 120px,260px 180px,100% 100%;
+  background-repeat:repeat,repeat,repeat,no-repeat;
+}
+.track::before{content:"";position:absolute;left:0;right:0;bottom:0;height:38px;background:var(--ground);border-top:2px solid var(--ground-line)}
+.track::after{content:"";position:absolute;left:0;right:0;bottom:15px;height:2px;background:repeating-linear-gradient(90deg,var(--ground-line) 0 22px,transparent 22px 44px)}
+.track>*{position:relative;z-index:1;flex:none}
+
+/* shop gate */
+.gate{width:172px;height:244px;display:flex;flex-direction:column;align-items:center;padding-top:44px}
+.gate::before,.gate::after{content:"";position:absolute;top:70px;bottom:0;width:6px;background:#8a5f2e;z-index:0}
+.gate::before{left:16px}.gate::after{right:16px}
+.lantern{position:absolute;top:0;width:28px;height:32px;border-radius:50% 50% 46% 46%;background:radial-gradient(circle at 50% 40%,#ff8a63,#c8452f 70%);box-shadow:0 0 18px #ff7a4f88;animation:glowy 3s ease-in-out infinite}
+.lantern::before{content:"";position:absolute;left:50%;top:-10px;width:1px;height:10px;background:#d9a76a}
+.lantern.l1{left:8px}.lantern.l2{right:8px;animation-delay:.9s}
+.banner{position:relative;z-index:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 8px 12px;background:var(--lantern);border:3px solid var(--gold-deep);border-radius:8px;color:var(--gold);box-shadow:0 8px 20px #0006}
+.banner b{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.15;letter-spacing:.08em}
+.banner i{font-family:var(--latin);font-style:normal;font-weight:600;font-size:15px;letter-spacing:.3em;margin-right:-.3em}
+.banner span{margin-top:4px;font-size:12px;letter-spacing:.22em;color:#ffe3b0}
+
+/* zone sign (vertical) */
+.zonesign{width:84px;height:226px;display:flex;flex-direction:column;align-items:center}
+.zonesign::after{content:"";flex:1;width:5px;background:var(--trim)}
+.zplate{writing-mode:vertical-rl;font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.24em;padding:14px 12px 10px 16px;border-radius:8px;background:linear-gradient(var(--plate-a),var(--plate-b));color:var(--accent-ink);box-shadow:0 6px 16px #0005}
+.zen{font-family:var(--latin);font-weight:600;font-size:12px;letter-spacing:.26em;margin:6px -.26em 4px 0;color:var(--accent)}
+
+/* stall */
+.stall{
+  appearance:none;background:none;border:0;padding:0;cursor:pointer;width:150px;display:flex;flex-direction:column;align-items:center;
+  -webkit-tap-highlight-color:transparent;transition:transform .15s ease;
+}
+.stall:active{transform:translateY(2px)}
+.plate{position:relative;z-index:2;margin-bottom:-16px;display:flex;flex-direction:column;align-items:center;min-width:88px;padding:6px 18px 5px;border-radius:7px;background:linear-gradient(var(--plate-a),var(--plate-b));color:var(--accent-ink);box-shadow:0 4px 10px #0005}
+.plate b{font-family:var(--display);font-weight:800;font-size:20px;line-height:1.15;letter-spacing:.14em;margin-right:-.14em}
+.plate i{font-family:var(--latin);font-style:normal;font-weight:600;font-size:10px;letter-spacing:.2em;margin-right:-.2em}
+.stall svg{width:150px;height:170px;display:block;overflow:visible}
+.stall.here svg{filter:drop-shadow(0 0 12px var(--glow))}
+.stall.visited .plate::after{content:"✓";position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--jade);color:#fff;font:700 12px/20px var(--body);text-align:center}
+.sa{fill:var(--awn-a)}.sb{fill:var(--awn-b)}
+.trim{fill:var(--trim)}
+.pnl{fill:var(--panel);stroke:var(--trim);stroke-width:1.5}
+.glow1{fill:var(--glow);opacity:.1}.glow2{fill:var(--glow);opacity:.14}
+.ctr{fill:var(--counter);stroke:var(--trim);stroke-width:1.5}
+.vel{fill:var(--velvet)}
+.lamp{fill:var(--glow);animation:glowy 2.4s ease-in-out infinite}
+.ms{fill:none;stroke:var(--metal);stroke-linecap:round}
+.mf{fill:var(--metal)}
+.gf{fill:var(--gem)}
+.hl{fill:none;stroke:#fff;stroke-opacity:.55;stroke-width:1}
+@keyframes glowy{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* gold price board */
+.board{width:156px;height:232px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.panelb{width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:12px 10px;background:#16302f;border:5px solid #8a5f2e;border-radius:8px;color:var(--gold);box-shadow:0 8px 18px #0006}
+.panelb small{font-size:12px;letter-spacing:.3em;margin-right:-.3em;color:#ffe3b0}
+.panelb b{font-weight:500;font-size:13px}
+.panelb strong{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.panelb span{font-size:11px;line-height:1.4;color:#cfe3d9}
+.legs{width:84px;height:76px;display:flex;justify-content:space-between}
+.legs i{width:6px;height:100%;background:#8a5f2e}
+
+/* walker */
+.walker{position:absolute;z-index:3;bottom:6px;left:0;width:40px;height:64px;pointer-events:none;transform:translateX(-50%) scaleX(var(--dir,1));transition:left 0ms linear}
+.walker svg{width:40px;height:64px;display:block}
+.walker.walking svg{animation:bob .3s ease-in-out infinite alternate}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+
+/* controls */
+.ctrl{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ctrl p{margin:0;font-size:14px;color:var(--ink-dim);text-align:center;font-variant-numeric:tabular-nums}
+.pill{background:var(--night-2);border:1px solid var(--edge);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:14px;white-space:nowrap}
+.pill.go{background:var(--gold);border-color:var(--gold);color:#3d130e;font-weight:700}
+.pill:active{transform:scale(.97)}
+.note{margin:0;font-size:12px;line-height:1.6;color:var(--ink-dim)}
+
+/* sheet */
+.backdrop{position:fixed;inset:0;z-index:20;background:#080a16a8;opacity:0;transition:opacity .22s ease}
+.backdrop.open{opacity:1}
+.sheet{
+  position:fixed;z-index:21;left:0;right:0;bottom:0;margin-inline:auto;width:min(100%,560px);max-height:88%;
+  display:flex;flex-direction:column;background:var(--sheet);border-top:3px solid var(--accent);border-radius:20px 20px 0 0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  transform:translateY(100%);transition:transform .26s ease;box-shadow:0 -12px 40px #0008;
+}
+.sheet.open{transform:none}
+.sh-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-top:16px;padding-bottom:10px}
+.crumb{margin:0;font-size:12px;letter-spacing:.2em;color:var(--accent)}
+.sh-head h2{margin:2px 0 0;font-family:var(--display);font-weight:800;font-size:28px;line-height:1.2;letter-spacing:.08em}
+.close{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--edge);background:#ffffff0d;cursor:pointer;font-size:16px}
+.sh-body{overflow-y:auto;min-height:0;display:flex;flex-direction:column;gap:16px;padding-bottom:12px}
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{min-width:0;aspect-ratio:1;border-radius:10px;border:1px dashed #ffffff3a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:repeating-linear-gradient(135deg,#ffffff0d 0 8px,#ffffff05 8px 16px),var(--panel)}
+.tile svg{width:66%;max-width:70px;height:auto}
+.tile span{font-size:11px;color:var(--ink-dim)}
+.sh-body h3{margin:0 0 4px;font-size:14px;font-weight:700;letter-spacing:.1em;display:flex;align-items:baseline;gap:8px}
+.sh-body h3 small{font-weight:400;font-size:12px;color:var(--ink-dim);letter-spacing:.04em}
+.prices{list-style:none;margin:0;padding:0}
+.prices li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed #ffffff2e;font-size:15px}
+.prices li:last-child{border-bottom:0}
+.prices b{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hint{margin:6px 0 0;font-size:12px;color:var(--ink-dim)}
+.say{background:#ffffff0d;border-radius:10px;padding:12px 14px}
+.say h3{margin-bottom:2px}
+.say p{margin:0;font-size:14px;color:var(--ink-dim)}
+.sh-foot{padding-top:10px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--edge)}
+.igbtn{display:flex;justify-content:center;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;text-decoration:none;border-radius:12px;padding:14px}
+.igbtn:active{transform:scale(.99)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="page">
+  <header class="brand">
+    <div>
+      <h1 class="shop">鑗惟伊</h1>
+      <p class="latin">LI WEI YI</p>
+    </div>
+    <p class="kinds">銀飾 · 金飾</p>
+  </header>
+
+  <div class="boss"><b>今日老闆說</b><p id="bossSays"></p></div>
+
+  <nav class="jump" aria-label="快速前往">
+    <button class="chip" type="button" data-jump="zs-silver"><i style="--c:#cdd8ee"></i>銀飾區</button>
+    <button class="chip" type="button" data-jump="board"><i style="--c:#16302f;box-shadow:0 0 0 2px #8a5f2e"></i>今日金價</button>
+    <button class="chip" type="button" data-jump="zs-gold"><i style="--c:#efc05a"></i>金飾區</button>
+  </nav>
+
+  <section class="scene" aria-label="鑗惟伊金銀街，可左右滑動">
+    <div class="moon" aria-hidden="true"></div>
+    <div class="street" id="street">
+      <div class="track" id="track">
+        <div class="walker" id="walker" aria-hidden="true">
+          <svg viewBox="0 0 40 64">
+            <rect x="12" y="46" width="6" height="16" rx="3" fill="#2a2f55"/>
+            <rect x="22" y="46" width="6" height="16" rx="3" fill="#2a2f55"/>
+            <path d="M10 28 Q20 22 30 28 L32 50 H8 Z" fill="#2f8f7f"/>
+            <rect x="17" y="28" width="6" height="22" fill="#e9c46a"/>
+            <circle cx="20" cy="15" r="9" fill="#f1d8bd"/>
+            <path d="M11 14 Q12 5 20 5 Q28 5 29 14 Q24 9 11 14Z" fill="#1c1c2e"/>
+            <circle cx="20" cy="4.5" r="4.5" fill="#1c1c2e"/>
+            <circle cx="24" cy="16" r="1.3" fill="#1c1c2e"/>
+            <rect x="26" y="36" width="9" height="9" rx="2" fill="#c8452f"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="ctrl" aria-label="逛街">
+    <button class="pill" type="button" id="prev">← 上一攤</button>
+    <p id="count" aria-live="polite">已逛 0 / 8 攤</p>
+    <button class="pill go" type="button" id="next">下一攤 →</button>
+  </nav>
+  <p class="note">試玩版：商品照片、價格與 IG 連結目前是占位，之後換成鑗惟伊的真實內容。</p>
+</div>
+
+<div class="backdrop" id="backdrop" hidden></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" hidden>
+  <div class="sh-head">
+    <div>
+      <p class="crumb" id="shCrumb"></p>
+      <h2 id="shTitle"></h2>
+    </div>
+    <button class="close" type="button" id="closeBtn" aria-label="關閉">✕</button>
+  </div>
+  <div class="sh-body" id="shBody"></div>
+  <div class="sh-foot"><a class="igbtn" id="igBtn" target="_blank" rel="noopener noreferrer">去 IG 看更多 <span aria-hidden="true">↗</span></a></div>
+</section>
+
+<script>
+(function(){
+  /* ---- 之後要換的內容都在這裡 ---- */
+  var IG_URL = "https://www.instagram.com/";
+  var BOSS_SAYS = "歡迎來鑗惟伊慢慢逛，看到喜歡的點進去看看。";
+  var GOLD_BOARD = { label: "黃金 每台錢", price: "$ ——", note: "請以店家當日報價為準" };
+  var KINDS = [
+    { id: "ring", zh: "戒指", en: "RINGS" },
+    { id: "necklace", zh: "項鍊", en: "NECKLACES" },
+    { id: "bracelet", zh: "手鍊", en: "BRACELETS" },
+    { id: "earring", zh: "耳環", en: "EARRINGS" }
+  ];
+  var ZONES = [
+    { id: "silver", zh: "銀飾區", en: "SILVER", price: "$ ——" },
+    { id: "gold", zh: "金飾區", en: "GOLD", price: "依當日金價" }
+  ];
+  /* ------------------------------- */
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var street = document.getElementById("street");
+  var track = document.getElementById("track");
+  var walker = document.getElementById("walker");
+  var sheet = document.getElementById("sheet");
+  var backdrop = document.getElementById("backdrop");
+  var shBody = document.getElementById("shBody");
+  document.getElementById("bossSays").textContent = BOSS_SAYS;
+  document.getElementById("igBtn").href = IG_URL;
+
+  function icon(kind) {
+    if (kind === "ring") {
+      return '<circle class="ms" cx="0" cy="8" r="12" stroke-width="4.5"/>' +
+        '<polygon class="gf" points="-8,-17 8,-17 12,-9 0,2 -12,-9"/>' +
+        '<path class="hl" d="M-12 -9 H12 M-8 -17 L-4 -9 L0 2 M8 -17 L4 -9 L0 2"/>';
+    }
+    if (kind === "necklace") {
+      return '<path class="ms" d="M-24 -16 Q0 30 24 -16" stroke-width="2.6"/>' +
+        '<line class="ms" x1="0" y1="7.5" x2="0" y2="11" stroke-width="2"/>' +
+        '<circle class="mf" cx="0" cy="15" r="5.5"/><circle class="gf" cx="0" cy="15" r="2.2"/>';
+    }
+    if (kind === "bracelet") {
+      return '<ellipse class="ms" cx="0" cy="0" rx="22" ry="12" stroke-width="5"/>' +
+        '<ellipse class="hl" cx="0" cy="0" rx="22" ry="12"/>' +
+        '<circle class="gf" cx="0" cy="12" r="4"/>' +
+        '<circle class="mf" cx="-12" cy="10" r="2.4"/><circle class="mf" cx="12" cy="10" r="2.4"/>';
+    }
+    var out = "";
+    [-12, 12].forEach(function (x) {
+      out += '<circle class="ms" cx="' + x + '" cy="-15" r="3" stroke-width="1.6"/>' +
+        '<line class="ms" x1="' + x + '" y1="-12" x2="' + x + '" y2="-6" stroke-width="1.6"/>' +
+        '<path class="mf" d="M' + x + ' -6 C' + (x + 9) + ' 4 ' + (x + 6) + ' 16 ' + x + ' 16 C' + (x - 6) + ' 16 ' + (x - 9) + ' 4 ' + x + ' -6Z"/>';
+    });
+    return out;
+  }
+
+  function stallSVG(kind) {
+    var n = 6, w = 142 / n, stripes = "", lamps = "";
+    for (var i = 0; i < n; i++) {
+      var x1 = 4 + i * w, x2 = x1 + w, xm = (x1 + x2) / 2;
+      stripes += '<path class="' + (i % 2 ? "sb" : "sa") + '" d="M' + x1 + ' 30H' + x2 + 'V50Q' + xm + ' 64 ' + x1 + ' 50Z"/>';
+      lamps += '<circle class="lamp" cx="' + xm + '" cy="64" r="2.6" style="animation-delay:' + (i * 0.35) + 's"/>';
+    }
+    return '<svg viewBox="0 0 150 170" aria-hidden="true">' +
+      '<rect class="trim" x="10" y="32" width="4" height="132"/><rect class="trim" x="136" y="32" width="4" height="132"/>' +
+      '<rect class="pnl" x="18" y="70" width="114" height="58" rx="5"/>' +
+      '<circle class="glow1" cx="75" cy="99" r="28"/><circle class="glow2" cx="75" cy="99" r="18"/>' +
+      '<g transform="translate(75 99) scale(.95)">' + icon(kind) + '</g>' +
+      '<rect class="trim" x="2" y="26" width="146" height="6" rx="3"/>' + stripes + lamps +
+      '<rect class="ctr" x="6" y="128" width="138" height="38" rx="3"/>' +
+      '<rect class="vel" x="26" y="131" width="98" height="7" rx="2"/></svg>';
+  }
+
+  var html = '';
+  html += '<div class="gate" id="gate"><span class="lantern l1"></span><span class="lantern l2"></span>' +
+    '<div class="banner"><b>鑗惟伊</b><i>LI WEI YI</i><span>銀飾 · 金飾</span></div></div>';
+  ZONES.forEach(function (z) {
+    if (z.id === "gold") {
+      html += '<div class="board" id="board"><div class="panelb"><small>今日金價</small><b>' + GOLD_BOARD.label +
+        '</b><strong>' + GOLD_BOARD.price + '</strong><span>' + GOLD_BOARD.note + '</span></div>' +
+        '<div class="legs"><i></i><i></i></div></div>';
+    }
+    html += '<div class="zonesign ' + z.id + '" id="zs-' + z.id + '"><div class="zplate">' + z.zh + '</div><div class="zen">' + z.en + '</div></div>';
+    KINDS.forEach(function (k) {
+      html += '<button class="stall ' + z.id + '" type="button" data-zone="' + z.id + '" data-kind="' + k.id + '" aria-label="' +
+        z.zh + k.zh + '，點開看商品"><span class="plate"><b>' + k.zh + '</b><i>' + k.en + '</i></span>' + stallSVG(k.id) + '</button>';
+    });
+  });
+  track.insertAdjacentHTML("beforeend", html);
+
+  var stalls = Array.prototype.slice.call(track.querySelectorAll(".stall"));
+  var gate = document.getElementById("gate");
+  var visited = {};
+  var idx = -1, curX = 0, timer = null, lastFocus = null;
+
+  function setCount() {
+    document.getElementById("count").textContent = "已逛 " + Object.keys(visited).length + " / " + stalls.length + " 攤";
+  }
+  function centerOf(el) { return el.offsetLeft + el.offsetWidth / 2; }
+
+  function placeWalker() {
+    curX = centerOf(gate);
+    walker.style.transitionDuration = "0ms";
+    walker.style.left = curX + "px";
+  }
+  placeWalker();
+
+  function walkTo(el, cb) {
+    var x = centerOf(el);
+    var dist = Math.abs(x - curX);
+    var ms = (reduce || dist < 2) ? 0 : Math.min(1500, Math.max(350, dist * 2.4));
+    if (dist >= 2) walker.style.setProperty("--dir", x > curX ? 1 : -1);
+    walker.style.transitionDuration = ms + "ms";
+    walker.style.left = x + "px";
+    curX = x;
+    walker.classList.toggle("walking", ms > 0);
+    stalls.forEach(function (s) { s.classList.toggle("here", s === el); });
+    street.scrollTo({ left: Math.max(0, x - street.clientWidth / 2), behavior: reduce ? "auto" : "smooth" });
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      walker.classList.remove("walking");
+      if (cb) cb();
+    }, ms);
+  }
+
+  function openSheet(stall) {
+    var z = ZONES.filter(function (q) { return q.id === stall.dataset.zone; })[0];
+    var k = KINDS.filter(function (q) { return q.id === stall.dataset.kind; })[0];
+    visited[stall.dataset.zone + stall.dataset.kind] = true;
+    stall.classList.add("visited");
+    setCount();
+
+    sheet.classList.remove("silver", "gold");
+    sheet.classList.add(z.id);
+    document.getElementById("shCrumb").textContent = z.zh + " · " + z.en;
+    document.getElementById("shTitle").textContent = k.zh;
+
+    var tiles = "";
+    for (var i = 0; i < 3; i++) {
+      tiles += '<div class="tile"><svg viewBox="-32 -32 64 64" aria-hidden="true">' + icon(k.id) + '</svg><span>照片待補</span></div>';
+    }
+    var rows = "";
+    ["A", "B", "C"].forEach(function (l) {
+      rows += '<li><span>範例款式 ' + l + '</span><b>' + z.price + '</b></li>';
+    });
+    shBody.innerHTML =
+      '<div class="photos">' + tiles + '</div>' +
+      '<div><h3>價目表<small>範例</small></h3><ul class="prices">' + rows + '</ul>' +
+      (z.id === "gold" ? '<p class="hint">金飾價格依當日金價為準，詳情請看街上的今日金價看板。</p>' : '') + '</div>' +
+      '<div class="say"><h3>老闆留言</h3><p>（這裡之後放老闆想對客人說的話）</p></div>';
+    shBody.scrollTop = 0;
+
+    lastFocus = document.activeElement;
+    sheet.hidden = false;
+    backdrop.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+    requestAnimationFrame(function () {
+      sheet.classList.add("open");
+      backdrop.classList.add("open");
+      document.getElementById("closeBtn").focus();
+    });
+  }
+
+  function closeSheet() {
+    if (sheet.hidden) return;
+    sheet.classList.remove("open");
+    backdrop.classList.remove("open");
+    document.documentElement.style.overflow = "";
+    setTimeout(function () {
+      sheet.hidden = true;
+      backdrop.hidden = true;
+    }, reduce ? 0 : 260);
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  stalls.forEach(function (s, i) {
+    s.addEventListener("click", function () {
+      idx = i;
+      walkTo(s, function () { openSheet(s); });
+    });
+  });
+  document.getElementById("closeBtn").addEventListener("click", closeSheet);
+  backdrop.addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (e) {
+    if (sheet.hidden) return;
+    if (e.key === "Escape") { closeSheet(); return; }
+    if (e.key === "Tab") {
+      var f = sheet.querySelectorAll("a[href],button");
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  document.getElementById("next").addEventListener("click", function () {
+    idx = (idx + 1) % stalls.length;
+    walkTo(stalls[idx]);
+  });
+  document.getElementById("prev").addEventListener("click", function () {
+    idx = idx <= 0 ? stalls.length - 1 : idx - 1;
+    walkTo(stalls[idx]);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-jump]"), function (b) {
+    b.addEventListener("click", function () {
+      var el = document.getElementById(b.dataset.jump);
+      if (el) street.scrollTo({ left: Math.max(0, el.offsetLeft - 16), behavior: reduce ? "auto" : "smooth" });
+    });
+  });
+  setCount();
+})();
+</script>
+
+</body></html>
